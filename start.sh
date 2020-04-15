@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "Hello!"
-echo "Using database $DB_NAME at $DB_USER:$DB_PASS@$DB_HOST"
+echo "Using database $DB_NAME at $DB_USER:$(echo $DB_PASS | tr -c '' '*')@$DB_HOST"
 
 echo ":: Downloading latest wordpress..."
 curl -o /tmp/wordpress.tgz https://wordpress.org/latest.tar.gz
