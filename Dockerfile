@@ -12,13 +12,7 @@ RUN apk add curl tar nginx php-mysqlnd;\
 	docker-php-ext-enable mysqli;\
 	mkdir -p /run/nginx;\
 	rm /etc/nginx/conf.d/default.conf;\
-	chmod +x /opt/start.sh;\
-	curl -o /tmp/wordpress.tgz https://wordpress.org/latest.tar.gz;\
-	tar -xf /tmp/wordpress.tgz;\
-	mv wordpress/wp-config-sample.php wordpress/wp-config.php;\
-	chown -R nginx: wordpress;\
-	rm /tmp/wordpress.tgz;\
-	apk del curl tar
+	chmod +x /opt/start.sh;
 
 ENTRYPOINT sh /opt/start.sh
 EXPOSE 80/tcp
