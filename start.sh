@@ -1,9 +1,24 @@
 #!/bin/sh
 echo "Hello!"
-echo "Using database $DB_NAME at $DB_USER:$(echo $DB_PASS | tr -c '' '*')@$DB_HOST"
+echo "Using database $DB_NAME at $DB_USER:$(echo -n "$DB_PASS" | tr -c '' '*')@$DB_HOST"
 
-# Inject database config into wp-config
-WP_CONFIG=/srv/wordpress/wp-config.php
+BASEDIR=/srv
+WORKDIR=$BASEDIR/wordpress
+WP_CONFIG=$WORKDIR/wp-config.php
+cd $BASEDIR
+
+# Fresh config
+if [ -f $WP_CONFIG ]; then
+	rm $WP_CONFIG
+fi
+cp $WORKDIR/wp-config-sample.php $WP_CONFIG
+
+# File perms
+chown -R www-data: $WORKDIR
+chmod 777 $WORKDIR
+
+# Config
+echo ":: Injecting database config"
 sed -i "s/localhost/$DB_HOST/" $WP_CONFIG
 sed -i "s/database_name_here/$DB_NAME/" $WP_CONFIG
 sed -i "s/username_here/$DB_USER/" $WP_CONFIG
