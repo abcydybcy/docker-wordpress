@@ -8,7 +8,7 @@ WP_CONFIG=$WORKDIR/wp-config.php
 cd $BASEDIR
 
 # If not present, install WP
-if [ ! -f $BASEDIR/index.php ]; then 
+if [ ! -f $WORKDIR/index.php ]; then 
 	echo ":: Downloading latest wordpress..."
 	curl -o /tmp/wordpress.tgz https://wordpress.org/latest.tar.gz
 	tar -xf /tmp/wordpress.tgz
@@ -22,7 +22,7 @@ fi
 cp $WORKDIR/wp-config-sample.php $WP_CONFIG
 
 # File perms
-chown -R nginx: $WORKDIR
+chown -R www-data: $WORKDIR
 chmod 777 $WORKDIR
 
 # Config
