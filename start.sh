@@ -22,7 +22,7 @@ fi
 cp $WORKDIR/wp-config-sample.php $WP_CONFIG
 
 # File perms
-chown -R www-data: $WORKDIR
+chown -R nginx: $WORKDIR
 chmod 777 $WORKDIR
 
 # Config

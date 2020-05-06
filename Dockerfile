@@ -7,9 +7,11 @@ RUN docker-php-ext-enable mysqli
 
 # nginx conf
 COPY --chown=root:root wordpress.conf /etc/nginx/conf.d/
-COPY --chown=root:root nginx.conf /etc/nginx/nginx.conf
 RUN mkdir -p /run/nginx
 RUN rm /etc/nginx/conf.d/default.conf
+
+# php-fpm conf
+COPY --chown=root:root www.conf /usr/local/etc/php-fpm.d/
 
 # start script
 COPY --chown=root:root start.sh /opt/
