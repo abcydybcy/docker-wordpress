@@ -10,7 +10,7 @@ services:
             - MYSQL_PASSWORD=wordpress
             - MYSQL_DATABASE=wordpress
     wordpress:
-        image: onstart
+        image: 0xf0ff/wordpress:latest-onstart
         container_name: wordpress
         environment:
             - DB_HOST=mysql
