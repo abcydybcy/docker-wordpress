@@ -7,27 +7,48 @@ WORKDIR=$BASEDIR/wordpress
 WP_CONFIG=$WORKDIR/wp-config.php
 cd $BASEDIR
 
-# Fresh config
-if [ -f $WP_CONFIG ]; then
-	rm $WP_CONFIG
-fi
-cp $WORKDIR/wp-config-sample.php $WP_CONFIG
-
 # File perms
-chown -R www-data: $WORKDIR
+chown -R nginx: $WORKDIR
 chmod 777 $WORKDIR
 
 # Config
-echo ":: Injecting database config"
-sed -i "s/localhost/$DB_HOST/" $WP_CONFIG
-sed -i "s/database_name_here/$DB_NAME/" $WP_CONFIG
-sed -i "s/username_here/$DB_USER/" $WP_CONFIG
-sed -i "s/password_here/$DB_PASS/" $WP_CONFIG
+echo ":: Generating config"
+cat > $WP_CONFIG << EOF
+<?php
+define( 'DB_NAME', '$DB_NAME' );
+define( 'DB_USER', '$DB_USER' );
+define( 'DB_PASSWORD', '$DB_PASS' );
+define( 'DB_HOST', '$DB_HOST' );
+define( 'WP_HOME', 'http://$WP_HOME' );
+define( 'WP_SITEURL', 'http://$WP_HOME' );
 
-if [ ! "x$WP_HOME" = "x" ]; then  # If $WP_HOME not empty
-	echo ":: Provided WP_HOME address is $WP_HOME"
-	echo "define( 'WP_HOME', 'http://$WP_HOME' );" >> $WP_CONFIG
-	echo "define( 'WP_SITEURL', 'http://$WP_HOME' );" >> $WP_CONFIG
+define( 'DB_CHARSET', 'utf8' );
+define( 'DB_COLLATE', '' );
+define( 'AUTH_KEY',         'put your unique phrase here' );
+define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
+define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
+define( 'NONCE_KEY',        'put your unique phrase here' );
+define( 'AUTH_SALT',        'put your unique phrase here' );
+define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
+define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
+define( 'NONCE_SALT',       'put your unique phrase here' );
+\$table_prefix = 'wp_';
+define( 'WP_DEBUG', false );
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+require_once ABSPATH . 'wp-settings.php';
+EOF
+
+# Update DB
+if [ ! "x$WP_OLD_HOME" = "x" ]; then
+echo ":: Updating database links"
+mysql -u "$DB_USER" --password="$DB_PASS" -h "$DB_HOST" "$DB_NAME" << EOF
+UPDATE wp_options SET option_value = replace(option_value, 'http://$WP_OLD_HOME', 'http://$WP_HOME') WHERE option_name = 'home' OR option_name = 'siteurl';
+UPDATE wp_posts SET guid = replace(guid, 'http://$WP_OLD_HOME','http://$WP_HOME');
+UPDATE wp_posts SET post_content = replace(post_content, 'http://$WP_OLD_HOME', 'http://$WP_HOME');
+UPDATE wp_postmeta SET meta_value = replace(meta_value,'http://$WP_OLD_HOME','http://$WP_HOME');
+EOF
 fi
 
 # Start
