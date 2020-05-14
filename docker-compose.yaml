@@ -1,0 +1,22 @@
+version: '3'
+services:
+    mysql:
+        image: mysql:5
+        container_name: mysql
+        environment:
+            - MYSQL_RANDOM_ROOT_PASSWORD=yes
+            - MYSQL_ROOT_USER=root
+            - MYSQL_USER=wordpress
+            - MYSQL_PASSWORD=wordpress
+            - MYSQL_DATABASE=wordpress
+    wordpress:
+        image: onstart
+        container_name: wordpress
+        environment:
+            - DB_HOST=mysql
+            - DB_USER=wordpress
+            - DB_PASS=wordpress
+            - DB_NAME=wordpress
+            - WP_HOME="localhost:8000"
+        ports:
+            - "8000:80"
