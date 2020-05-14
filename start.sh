@@ -36,6 +36,17 @@ echo ":: Provided WP_HOME address is $WP_HOME"
 echo "define( 'WP_HOME', 'http://$WP_HOME' );" >> $WP_CONFIG
 echo "define( 'WP_SITEURL', 'http://$WP_HOME' );" >> $WP_CONFIG
 
+# Update DB
+if [ ! "x$WP_OLD_HOME" = "x" ]; then
+echo ":: Updating database links"
+mysql -u "$DB_USER" --password="$DB_PASS" -h "$DB_HOST" "$DB_NAME" << EOF
+UPDATE wp_options SET option_value = replace(option_value, 'http://$WP_OLD_HOME', 'http://$WP_HOME') WHERE option_name = 'home' OR option_name = 'siteurl';
+UPDATE wp_posts SET guid = replace(guid, 'http://$WP_OLD_HOME','http://$WP_HOME');
+UPDATE wp_posts SET post_content = replace(post_content, 'http://$WP_OLD_HOME', 'http://$WP_HOME');
+UPDATE wp_postmeta SET meta_value = replace(meta_value,'http://$WP_OLD_HOME','http://$WP_HOME');
+EOF
+fi
+
 # Start
 echo ":: All done, spinning up."
 php-fpm -y /usr/local/etc/php-fpm.conf -c /usr/local/etc/php/php.ini-production -D
