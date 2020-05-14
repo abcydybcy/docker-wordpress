@@ -8,4 +8,5 @@ Environment variables:
   - `DB_NAME`: Database name
   - `DB_USER`: Database user
   - `DB_PASS`: Database password
-  - `WP_HOME`: FQDN/IP to use in Wordpress (required with `*-onstart` tags)
+  - `WP_HOME`: FQDN/IP to use in Wordpress
+  - `WP_OLD_HOME`: Old WP_HOME value, when specified URLs in the database will be updated with the new value.
